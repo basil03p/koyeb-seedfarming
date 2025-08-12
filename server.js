@@ -97,6 +97,12 @@ users.set(process.env.ADMIN_USERNAME || 'admin', defaultAdmin);
 // WebTorrent client
 const client = new WebTorrent();
 
+// Add error handling for WebTorrent client
+client.on('error', (err) => {
+  console.error('WebTorrent client error:', err.message);
+  // Don't crash the application on torrent errors
+});
+
 // Function to get disk space information
 function getDiskSpace() {
   try {
@@ -230,7 +236,7 @@ app.post('/api/torrents/upload', requireAuth, upload.single('torrent'), (req, re
     
     const torrentData = fs.readFileSync(req.file.path);
     
-    client.add(torrentData, (torrent) => {
+    client.add(torrentData, { destroyStoreOnDestroy: true }, (torrent) => {
       const torrentInfo = {
         id: torrent.infoHash,
         name: torrent.name,
@@ -254,8 +260,22 @@ app.post('/api/torrents/upload', requireAuth, upload.single('torrent'), (req, re
       res.json({ success: true, torrent: torrentInfo });
     });
     
+    // Handle torrent errors for this specific torrent
+    client.on('error', (err) => {
+      if (err.message.includes('duplicate torrent')) {
+        // Clean up uploaded file if duplicate
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+        return res.status(400).json({ error: 'Torrent already exists in the client' });
+      }
+    });
+    
   } catch (error) {
     console.error('Upload error:', error);
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
     res.status(500).json({ error: 'Failed to add torrent' });
   }
 });
@@ -268,7 +288,13 @@ app.post('/api/torrents/magnet', requireAuth, (req, res) => {
       return res.status(400).json({ error: 'Invalid magnet URI' });
     }
     
-    client.add(magnetUri, (torrent) => {
+    // Check if torrent already exists
+    const existingTorrent = client.get(magnetUri);
+    if (existingTorrent) {
+      return res.status(400).json({ error: 'Torrent already exists in the client' });
+    }
+    
+    client.add(magnetUri, { destroyStoreOnDestroy: true }, (torrent) => {
       const torrentInfo = {
         id: torrent.infoHash,
         name: torrent.name || 'Unknown',
@@ -291,6 +317,9 @@ app.post('/api/torrents/magnet', requireAuth, (req, res) => {
     
   } catch (error) {
     console.error('Magnet error:', error);
+    if (error.message.includes('duplicate torrent')) {
+      return res.status(400).json({ error: 'Torrent already exists in the client' });
+    }
     res.status(500).json({ error: 'Failed to add magnet link' });
   }
 });
