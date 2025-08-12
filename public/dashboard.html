@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torrent Seeder - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="dashboard-page">
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-seedling"></i>
+            <span>Torrent Seeder</span>
+        </div>
+        <div class="nav-menu">
+            <a href="#dashboard" class="nav-link active" data-tab="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+            <a href="#torrents" class="nav-link" data-tab="torrents">
+                <i class="fas fa-download"></i>
+                Torrents
+            </a>
+            <a href="#stats" class="nav-link" data-tab="stats">
+                <i class="fas fa-chart-bar"></i>
+                Statistics
+            </a>
+            <a href="#" class="nav-link" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-header">
+                <h1>Dashboard</h1>
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalTorrents">0</h3>
+                            <p>Total Torrents</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="seedingTorrents">0</h3>
+                            <p>Seeding</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="monthlyTraffic">0 GB</h3>
+                            <p>Monthly Traffic</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="remainingBandwidth">100 GB</h3>
+                            <p>Remaining (Koyeb)</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-hdd"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="freeSpace">0 GB</h3>
+                            <p>Free Disk Space</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="addTorrentBtn">
+                    <i class="fas fa-plus"></i>
+                    Add Torrent
+                </button>
+                <button class="btn btn-secondary" id="addMagnetBtn">
+                    <i class="fas fa-magnet"></i>
+                    Add Magnet
+                </button>
+            </div>
+            
+            <div class="recent-activity">
+                <h2>Recent Activity</h2>
+                <div id="recentTorrents" class="torrent-list">
+                    <!-- Recent torrents will be populated here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Torrents Tab -->
+        <div id="torrents" class="tab-content">
+            <div class="section-header">
+                <h1>Torrents</h1>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="addTorrentBtn2">
+                        <i class="fas fa-plus"></i>
+                        Add Torrent
+                    </button>
+                    <button class="btn btn-secondary" id="addMagnetBtn2">
+                        <i class="fas fa-magnet"></i>
+                        Add Magnet
+                    </button>
+                </div>
+            </div>
+            
+            <div class="torrents-container">
+                <div id="torrentsList" class="torrent-list">
+                    <!-- Torrents will be populated here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Tab -->
+        <div id="stats" class="tab-content">
+            <div class="section-header">
+                <h1>Statistics</h1>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stats-card">
+                    <h3>Traffic Usage</h3>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div id="trafficProgress" class="progress-fill"></div>
+                        </div>
+                        <span id="trafficPercent">0%</span>
+                    </div>
+                    <div class="stats-details">
+                        <div class="stat-row">
+                            <span>Monthly:</span>
+                            <span id="statsMonthly">0 GB</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Total:</span>
+                            <span id="statsTotal">0 GB</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Remaining:</span>
+                            <span id="statsRemaining">100 GB</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card">
+                    <h3>Koyeb Limits</h3>
+                    <div class="koyeb-info">
+                        <div class="limit-item">
+                            <i class="fas fa-database"></i>
+                            <span>Monthly Bandwidth: 100 GB</span>
+                        </div>
+                        <div class="limit-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Sleep after inactivity</span>
+                        </div>
+                        <div class="limit-item">
+                            <i class="fas fa-memory"></i>
+                            <span>512 MB RAM limit</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card">
+                    <h3>Disk Space Usage</h3>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div id="diskProgress" class="progress-fill"></div>
+                        </div>
+                        <span id="diskPercent">0%</span>
+                    </div>
+                    <div class="stats-details">
+                        <div class="stat-row">
+                            <span>Total Space:</span>
+                            <span id="diskTotal">0 GB</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Used Space:</span>
+                            <span id="diskUsed">0 GB</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Free Space:</span>
+                            <span id="diskFree">0 GB</span>
+                        </div>
+                    </div>
+                    <div class="koyeb-info" style="margin-top: 16px;">
+                        <div class="limit-item">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Koyeb uses ephemeral storage (resets on restart)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="torrentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Torrent File</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="torrentForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="torrentFile">Select Torrent File:</label>
+                    <input type="file" id="torrentFile" name="torrent" accept=".torrent" required>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('torrentModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="magnetModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Magnet Link</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="magnetForm">
+                <div class="form-group">
+                    <label for="magnetUri">Magnet URI:</label>
+                    <textarea id="magnetUri" name="magnetUri" placeholder="magnet:?xt=urn:btih:..." required></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('magnetModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <script src="dashboard.js"></script>
+</body>
+</html>

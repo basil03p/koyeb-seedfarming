@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torrent Seeder - Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-seedling logo-icon"></i>
+                <h1>Torrent Seeder</h1>
+                <p>Private Tracker Seeding Platform</p>
+            </div>
+            
+            <div class="login-form-container">
+                <form id="loginForm" class="login-form">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" name="username" placeholder="Username" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </button>
+                </form>
+                
+                <div class="login-footer">
+                    <p>Don't have an account? <a href="#" id="showRegister">Register here</a></p>
+                </div>
+            </div>
+            
+            <div class="register-form-container" style="display: none;">
+                <form id="registerForm" class="login-form">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="regUsername" name="username" placeholder="Username" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="regPassword" name="password" placeholder="Password" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Register
+                    </button>
+                </form>
+                
+                <div class="login-footer">
+                    <p>Already have an account? <a href="#" id="showLogin">Sign in here</a></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Upload Torrents</h3>
+                <p>Upload .torrent files or add magnet links</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-chart-line"></i>
+                <h3>Real-time Stats</h3>
+                <p>Monitor your seeding performance</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-server"></i>
+                <h3>Koyeb Optimized</h3>
+                <p>Runs efficiently on Koyeb free tier</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <script>
+        document.getElementById('showRegister').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector('.login-form-container').style.display = 'none';
+            document.querySelector('.register-form-container').style.display = 'block';
+        });
+        
+        document.getElementById('showLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector('.register-form-container').style.display = 'none';
+            document.querySelector('.login-form-container').style.display = 'block';
+        });
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: formData.get('username'),
+                        password: formData.get('password')
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('Login successful!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    showNotification(result.error || 'Login failed', 'error');
+                }
+            } catch (error) {
+                showNotification('Network error', 'error');
+            }
+        });
+        
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('Registration successful! Please login.', 'success');
+                    document.getElementById('showLogin').click();
+                } else {
+                    showNotification(result.error || 'Registration failed', 'error');
+                }
+            } catch (error) {
+                showNotification('Network error', 'error');
+            }
+        });
+        
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
